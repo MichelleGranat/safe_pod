@@ -1,6 +1,10 @@
 [package]
 name = "safe_pod"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
 
+[workspace]
+members = ["safe_pod_derive"]
+
 [dependencies]
+safe_pod_derive = {path = "./safe_pod_derive"}

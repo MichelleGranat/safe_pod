@@ -1,0 +1,12 @@
+[package]
+name = "safe_pod_derive"
+version = "0.0.1"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc_macro2 = "1"
+syn = "2"
+quote = "1"
