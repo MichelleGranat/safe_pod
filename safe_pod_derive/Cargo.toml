@@ -2,12 +2,17 @@
 name = "safe_pod_derive"
 version = "0.0.1"
 edition = "2021"
+authors = ["Michelle Granat"]
+description = "Derive macros for safe_pod crate"
+repository = "https://github.com/MichelleGranat/safe_pod"
+license = "AGPL-3.0"
+license-file = "LICENSE"
 
 [lib]
 proc-macro = true
 doctest = false
 
 [dependencies]
-proc-macro2 = "1"
-syn = "2"
-quote = "1"
+proc-macro2 = "1.0"
+syn = "2.0"
+quote = "1.0"

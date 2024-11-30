@@ -17,4 +17,4 @@ members = ["safe_pod_derive"]
 doctest = false
 
 [dependencies]
-safe_pod_derive = {path = "./safe_pod_derive"}
+safe_pod_derive = {path = "./safe_pod_derive", version = "0.0.1"}
