@@ -1,7 +1,7 @@
 use crate::zeroable::Zeroable;
 
-/// Errors for converting byte arrays
-/// to [`Pod`] type instance
+/// Errors for serializeing and deseserializeing
+/// [`Pod`] types to and from byte arrays
 #[derive(Debug, PartialEq)]
 #[non_exhaustive]
 pub enum PodError {
