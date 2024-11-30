@@ -5,96 +5,112 @@ pub trait Zeroable: Sized {
 }
 
 impl Zeroable for bool {
+    #[inline]
     fn zeroed() -> Self {
         false
     }
 }
 
 impl Zeroable for u8 {
+    #[inline]
     fn zeroed() -> Self {
         0u8
     }
 }
 
 impl Zeroable for u16 {
+    #[inline]
     fn zeroed() -> Self {
         0u16
     }
 }
 
 impl Zeroable for u32 {
+    #[inline]
     fn zeroed() -> Self {
         0u32
     }
 }
 
 impl Zeroable for u64 {
+    #[inline]
     fn zeroed() -> Self {
         0u64
     }
 }
 
 impl Zeroable for u128 {
+    #[inline]
     fn zeroed() -> Self {
         0u128
     }
 }
 
 impl Zeroable for usize {
+    #[inline]
     fn zeroed() -> Self {
         0usize
     }
 }
 
 impl Zeroable for i8 {
+    #[inline]
     fn zeroed() -> Self {
         0i8
     }
 }
 
 impl Zeroable for i16 {
+    #[inline]
     fn zeroed() -> Self {
         0i16
     }
 }
 
 impl Zeroable for i32 {
+    #[inline]
     fn zeroed() -> Self {
         0i32
     }
 }
 
 impl Zeroable for i64 {
+    #[inline]
     fn zeroed() -> Self {
         0i64
     }
 }
 
 impl Zeroable for i128 {
+    #[inline]
     fn zeroed() -> Self {
         0i128
     }
 }
 
 impl Zeroable for isize {
+    #[inline]
     fn zeroed() -> Self {
         0isize
     }
 }
 
 impl Zeroable for f32 {
+    #[inline]
     fn zeroed() -> Self {
         0f32
     }
 }
 
 impl Zeroable for f64 {
+    #[inline]
     fn zeroed() -> Self {
         0f64
     }
 }
 
 impl<T: Zeroable + Copy, const N: usize> Zeroable for [T; N] {
+    #[inline]
     fn zeroed() -> Self {
         [T::zeroed(); N]
     }
