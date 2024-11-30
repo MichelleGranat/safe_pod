@@ -4,16 +4,16 @@ use syn::{spanned::Spanned, Data, DeriveInput, Error, Fields, Ident, Type};
 
 /// Implementation of derive macro for Zeroable trait
 pub fn derive_zeroable_impl(input: DeriveInput) -> TokenStream {
-    // If the type that derives zeroable is a union
+    // If the type that derives Zeroable is a union
     // return error
     if let Data::Union(d) = &input.data {
         return Error::new(
             d.union_token.span,
-            "union types cannot be Zeroable"
+            "Union types cannot be Zeroable"
         ).to_compile_error();
     }
 
-    // If the type that derives zeroable is a struct
+    // If the type that derives Zeroable is a struct
     if let Data::Struct(d) = &input.data {
         let name = input.ident;
         let mut fields: Vec<(Ident, Type)> = Vec::new();
@@ -22,7 +22,7 @@ pub fn derive_zeroable_impl(input: DeriveInput) -> TokenStream {
             Fields::Unit => {
                 return Error::new(
                     name.span(),
-                    "Unit structs are not zeroable"
+                    "Unit structs cannot be zeroable"
                 ).to_compile_error();
             },
             Fields::Unnamed(f) => {
@@ -46,7 +46,7 @@ pub fn derive_zeroable_impl(input: DeriveInput) -> TokenStream {
         }.implementation();
     }
 
-    // If the type that derives zeroable is an enum
+    // If the type that derives Zeroable is an enum
     if let Data::Enum(d) = &input.data {
         return Error::new(
             d.enum_token.span,
@@ -66,15 +66,15 @@ pub struct DeriveZeroableStruct {
 
 impl DeriveZeroableStruct {
     /// Returns the Zeroable implementation for the struct
-    pub fn implementation(&self) -> TokenStream {
+    pub fn implementation(self) -> TokenStream {
         // Generate zeroed fields instructions
         let mut zeroed_fields: Vec<TokenStream> = Vec::new();
 
-        for (n, t) in &self.fields {
+        for (n, t) in self.fields {
             let ty_span = t.span();
             // Add zeroing
             zeroed_fields.push(
-                quote_spanned!(ty_span => #n: #t::zeroed())
+                quote_spanned!(ty_span => #n: <#t as Zeroable>::zeroed())
             );
         }
 
@@ -83,9 +83,7 @@ impl DeriveZeroableStruct {
         quote! {
             impl Zeroable for #name {
                 fn zeroed() -> Self {
-                    Self {
-                        #(#zeroed_fields)*,
-                    }
+                    Self { #(#zeroed_fields),* }
                 }
             }
         }.to_token_stream()
