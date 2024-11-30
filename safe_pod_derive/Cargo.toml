@@ -6,7 +6,7 @@ authors = ["Michelle Granat"]
 description = "Derive macros for safe_pod crate"
 repository = "https://github.com/MichelleGranat/safe_pod"
 license = "AGPL-3.0"
-license-file = "LICENSE"
+license-file = "../LICENSE"
 
 [lib]
 proc-macro = true
