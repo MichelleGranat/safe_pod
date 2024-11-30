@@ -13,6 +13,16 @@ pub enum PodError {
     NotInRange,
 }
 
+impl std::fmt::Display for PodError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self {
+            Self::NotEnoughSpace => write!(f, "NotEnughSpace"),
+            Self::NotInRange => write!(f, "NotInRange"),
+        }
+    }
+}
+impl std::error::Error for PodError { }
+
 /// A type that can be created 
 /// from and turned to a byte array
 pub trait Pod: Zeroable {
