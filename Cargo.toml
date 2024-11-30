@@ -8,7 +8,7 @@ readme = "README.md"
 repository = "https://github.com/MichelleGranat/safe_pod"
 license = "AGPL-3.0"
 license-file = "LICENSE"
-keywords = ["pod", "binary", "serialization", "deserialization", "data", "encode"]
+keywords = ["pod", "binary", "serialization", "deserialization", "data"]
 
 [workspace]
 members = ["safe_pod_derive"]
