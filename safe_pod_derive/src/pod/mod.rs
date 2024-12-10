@@ -137,7 +137,7 @@ impl DerivePodStruct {
                 #[inline]
                 fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
                     if buffer.len() < Self::SIZE {
-                        return Err(PodError::NotEnoughSpace);
+                        return Err(PodError::OutOfSpace);
                     }
 
                     let mut bytes = 0usize;
@@ -150,7 +150,7 @@ impl DerivePodStruct {
                 #[inline]
                 fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
                     if buffer.len() < Self::SIZE {
-                        return Err(PodError::NotEnoughSpace);
+                        return Err(PodError::OutOfSpace);
                     }
 
                     let mut bytes = 0usize;
@@ -163,7 +163,7 @@ impl DerivePodStruct {
                 #[inline]
                 fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
                     if buffer.len() < Self::SIZE {
-                        return Err(PodError::NotEnoughSpace);
+                        return Err(PodError::OutOfSpace);
                     }
 
                     let mut bytes = 0usize;
@@ -176,7 +176,7 @@ impl DerivePodStruct {
                 #[inline]
                 fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
                     if buffer.len() < Self::SIZE {
-                        return Err(PodError::NotEnoughSpace);
+                        return Err(PodError::OutOfSpace);
                     }
 
                     let mut bytes = 0usize;

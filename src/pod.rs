@@ -7,17 +7,17 @@ use crate::zeroable::Zeroable;
 pub enum PodError {
     /// Not enough bytes in buffer
     /// to construct type
-    NotEnoughSpace,
+    OutOfSpace,
     /// The bytes in the buffer are not in 
     /// the permitted range for the type
-    NotInRange,
+    OutOfRange,
 }
 
 impl std::fmt::Display for PodError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match &self {
-            Self::NotEnoughSpace => write!(f, "NotEnughSpace"),
-            Self::NotInRange => write!(f, "NotInRange"),
+            Self::OutOfSpace => write!(f, "NotEnughSpace"),
+            Self::OutOfRange => write!(f, "NotInRange"),
         }
     }
 }
@@ -50,7 +50,7 @@ impl Pod for bool {
     #[inline]
     fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         if buffer[0] == 0 {
@@ -58,14 +58,14 @@ impl Pod for bool {
         } else if buffer[0] == 1 {
             Ok(true)
         } else {
-            Err(PodError::NotInRange)
+            Err(PodError::OutOfRange)
         }
     }
 
     #[inline]
     fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         if buffer[0] == 0 {
@@ -73,14 +73,14 @@ impl Pod for bool {
         } else if buffer[0] == 1 {
             Ok(true)
         } else {
-            Err(PodError::NotInRange)
+            Err(PodError::OutOfRange)
         }
     }
 
     #[inline]
     fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         if *self {
@@ -95,7 +95,7 @@ impl Pod for bool {
     #[inline]
     fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         if *self {
@@ -114,7 +114,7 @@ impl Pod for u8 {
     #[inline]
     fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(u8::from_le_bytes([buffer[0]]))
@@ -123,7 +123,7 @@ impl Pod for u8 {
     #[inline]
     fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(u8::from_be_bytes([buffer[0]]))
@@ -132,7 +132,7 @@ impl Pod for u8 {
     #[inline]
     fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         buffer[0] = u8::to_le_bytes(*self)[0];
@@ -142,7 +142,7 @@ impl Pod for u8 {
     #[inline]
     fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         buffer[0] = u8::to_be_bytes(*self)[0];
@@ -156,7 +156,7 @@ impl Pod for u16 {
     #[inline]
     fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(u16::from_le_bytes([buffer[0], buffer[1]]))
@@ -165,7 +165,7 @@ impl Pod for u16 {
     #[inline]
     fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(u16::from_be_bytes([buffer[0], buffer[1]]))
@@ -174,7 +174,7 @@ impl Pod for u16 {
     #[inline]
     fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = u16::to_le_bytes(*self);
@@ -188,7 +188,7 @@ impl Pod for u16 {
     #[inline]
     fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = u16::to_be_bytes(*self);
@@ -206,7 +206,7 @@ impl Pod for u32 {
     #[inline]
     fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(u32::from_le_bytes([
@@ -217,7 +217,7 @@ impl Pod for u32 {
     #[inline]
     fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(u32::from_be_bytes([
@@ -228,7 +228,7 @@ impl Pod for u32 {
     #[inline]
     fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = u32::to_le_bytes(*self);
@@ -244,7 +244,7 @@ impl Pod for u32 {
     #[inline]
     fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = u32::to_be_bytes(*self);
@@ -264,7 +264,7 @@ impl Pod for u64 {
     #[inline]
     fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(u64::from_le_bytes([
@@ -276,7 +276,7 @@ impl Pod for u64 {
     #[inline]
     fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(u64::from_be_bytes([
@@ -288,7 +288,7 @@ impl Pod for u64 {
     #[inline]
     fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = u64::to_le_bytes(*self);
@@ -308,7 +308,7 @@ impl Pod for u64 {
     #[inline]
     fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = u64::to_be_bytes(*self);
@@ -332,7 +332,7 @@ impl Pod for u128 {
     #[inline]
     fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(u128::from_le_bytes([
@@ -346,7 +346,7 @@ impl Pod for u128 {
     #[inline]
     fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(u128::from_be_bytes([
@@ -360,7 +360,7 @@ impl Pod for u128 {
     #[inline]
     fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = u128::to_le_bytes(*self);
@@ -388,7 +388,7 @@ impl Pod for u128 {
     #[inline]
     fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = u128::to_be_bytes(*self);
@@ -420,7 +420,7 @@ impl Pod for i8 {
     #[inline]
     fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(i8::from_le_bytes([buffer[0]]))
@@ -429,7 +429,7 @@ impl Pod for i8 {
     #[inline]
     fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(i8::from_be_bytes([buffer[0]]))
@@ -438,7 +438,7 @@ impl Pod for i8 {
     #[inline]
     fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         buffer[0] = i8::to_le_bytes(*self)[0];
@@ -448,7 +448,7 @@ impl Pod for i8 {
     #[inline]
     fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         buffer[0] = i8::to_be_bytes(*self)[0];
@@ -462,7 +462,7 @@ impl Pod for i16 {
     #[inline]
     fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(i16::from_le_bytes([buffer[0], buffer[1]]))
@@ -471,7 +471,7 @@ impl Pod for i16 {
     #[inline]
     fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(i16::from_be_bytes([buffer[0], buffer[1]]))
@@ -480,7 +480,7 @@ impl Pod for i16 {
     #[inline]
     fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = i16::to_le_bytes(*self);
@@ -494,7 +494,7 @@ impl Pod for i16 {
     #[inline]
     fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
         
         let bytes = i16::to_be_bytes(*self);
@@ -512,7 +512,7 @@ impl Pod for i32 {
     #[inline]
     fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(i32::from_le_bytes([
@@ -523,7 +523,7 @@ impl Pod for i32 {
     #[inline]
     fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(i32::from_be_bytes([
@@ -534,7 +534,7 @@ impl Pod for i32 {
     #[inline]
     fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = i32::to_le_bytes(*self);
@@ -550,7 +550,7 @@ impl Pod for i32 {
     #[inline]
     fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = i32::to_be_bytes(*self);
@@ -570,7 +570,7 @@ impl Pod for i64 {
     #[inline]
     fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(i64::from_le_bytes([
@@ -582,7 +582,7 @@ impl Pod for i64 {
     #[inline]
     fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(i64::from_be_bytes([
@@ -594,7 +594,7 @@ impl Pod for i64 {
     #[inline]
     fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = i64::to_le_bytes(*self);
@@ -614,7 +614,7 @@ impl Pod for i64 {
     #[inline]
     fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = i64::to_be_bytes(*self);
@@ -638,7 +638,7 @@ impl Pod for i128 {
     #[inline]
     fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(i128::from_le_bytes([
@@ -652,7 +652,7 @@ impl Pod for i128 {
     #[inline]
     fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(i128::from_be_bytes([
@@ -666,7 +666,7 @@ impl Pod for i128 {
     #[inline]
     fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = i128::to_le_bytes(*self);
@@ -694,7 +694,7 @@ impl Pod for i128 {
     #[inline]
     fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = i128::to_be_bytes(*self);
@@ -726,7 +726,7 @@ impl Pod for f32 {
     #[inline]
     fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(f32::from_le_bytes([
@@ -737,7 +737,7 @@ impl Pod for f32 {
     #[inline]
     fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(f32::from_be_bytes([
@@ -748,7 +748,7 @@ impl Pod for f32 {
     #[inline]
     fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = f32::to_le_bytes(*self);
@@ -764,7 +764,7 @@ impl Pod for f32 {
     #[inline]
     fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = f32::to_be_bytes(*self);
@@ -784,7 +784,7 @@ impl Pod for f64 {
     #[inline]
     fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(f64::from_le_bytes([
@@ -796,7 +796,7 @@ impl Pod for f64 {
     #[inline]
     fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         Ok(f64::from_be_bytes([
@@ -808,7 +808,7 @@ impl Pod for f64 {
     #[inline]
     fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = f64::to_le_bytes(*self);
@@ -828,7 +828,7 @@ impl Pod for f64 {
     #[inline]
     fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
         if buffer.len() < Self::SIZE {
-            return Err(PodError::NotEnoughSpace);
+            return Err(PodError::OutOfSpace);
         }
 
         let bytes = f64::to_be_bytes(*self);
@@ -846,41 +846,71 @@ impl Pod for f64 {
     }
 }
 
-// impl<T: Pod + Copy, const N: usize> Pod for [T; N] {
-//     const SIZE: usize = N * T::SIZE;
+impl<T: Pod + Copy, const N: usize> Pod for [T; N] {
+    const SIZE: usize = N * T::SIZE;
 
-//     fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
-//         if buffer.len() < Self::SIZE {
-//             return Err(PodError::NotEnoughSpace);
-//         }
+    #[inline]
+    fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
+        if buffer.len() < Self::SIZE {
+            return Err(PodError::OutOfSpace);
+        }
 
-//         todo!()
-//     }
+        // Initialyze zeroed array
+        let mut array = [T::zeroed(); N];
 
-//     fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
-//         if buffer.len() < Self::SIZE {
-//             return Err(PodError::NotEnoughSpace);
-//         }
+        // Loop over each element in the array
+        for i in 0..N {
+            array[i] = T::from_le_bytes(&buffer[i * T::SIZE..i * T::SIZE + T::SIZE])?;
+        }
 
-//         todo!()
-//     }
+        Ok(array)
+    }
 
-//     fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
-//         if buffer.len() < Self::SIZE {
-//             return Err(PodError::NotEnoughSpace);
-//         }
+    #[inline]
+    fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
+        if buffer.len() < Self::SIZE {
+            return Err(PodError::OutOfSpace);
+        }
 
-//         todo!()
-//     }
+        // Initialyze zeroed array
+        let mut array = [T::zeroed(); N];
 
-//     fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
-//         if buffer.len() < Self::SIZE {
-//             return Err(PodError::NotEnoughSpace);
-//         }
+        // Loop over each element in the array
+        for i in 0..N {
+            array[i] = T::from_be_bytes(&buffer[i * T::SIZE..i * T::SIZE + T::SIZE])?;
+        }
 
-//         todo!()
-//     }
-// }
+        Ok(array)
+    }
+
+    #[inline]
+    fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
+        if buffer.len() < Self::SIZE {
+            return Err(PodError::OutOfSpace);
+        }
+
+        // Loop over each element in the array
+        for i in 0..N {
+            self[i].to_le_bytes(&mut buffer[i * T::SIZE..i * T::SIZE + T::SIZE])?;
+        }
+
+        Ok(T::SIZE * N)
+    }
+
+    #[inline]
+    fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
+        if buffer.len() < Self::SIZE {
+            return Err(PodError::OutOfSpace);
+        }
+
+        // Loop over each element in the array
+        for i in 0..N {
+            self[i].to_be_bytes(&mut buffer[i * T::SIZE..i * T::SIZE + T::SIZE])?;
+        }
+
+        Ok(T::SIZE * N)
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -904,10 +934,10 @@ mod tests {
         let buffer_read_fail1 = [0u8; <bool as Pod>::SIZE - 1];
         let buffer_read_fail2: [u8; 1] = [3u8];
         
-        assert_eq!(bool::from_le_bytes(&buffer_read_fail1), Err(PodError::NotEnoughSpace));
-        assert_eq!(bool::from_be_bytes(&buffer_read_fail1), Err(PodError::NotEnoughSpace));
-        assert_eq!(bool::from_be_bytes(&buffer_read_fail2), Err(PodError::NotInRange));
-        assert_eq!(bool::from_be_bytes(&buffer_read_fail2), Err(PodError::NotInRange));
+        assert_eq!(bool::from_le_bytes(&buffer_read_fail1), Err(PodError::OutOfSpace));
+        assert_eq!(bool::from_be_bytes(&buffer_read_fail1), Err(PodError::OutOfSpace));
+        assert_eq!(bool::from_be_bytes(&buffer_read_fail2), Err(PodError::OutOfRange));
+        assert_eq!(bool::from_be_bytes(&buffer_read_fail2), Err(PodError::OutOfRange));
 
         // Write success
         let mut buffer_write1 = [0u8; <bool as Pod>::SIZE * 2];
@@ -938,8 +968,8 @@ mod tests {
         // Write fail
         let mut buffer_write_fail = [0u8; <bool as Pod>::SIZE - 1];
 
-        assert_eq!(true.to_le_bytes(&mut buffer_write_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(true.to_be_bytes(&mut buffer_write_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(true.to_le_bytes(&mut buffer_write_fail), Err(PodError::OutOfSpace));
+        assert_eq!(true.to_be_bytes(&mut buffer_write_fail), Err(PodError::OutOfSpace));
     }
 
     #[test]
@@ -959,8 +989,8 @@ mod tests {
         // Read fail
         let buffer_read_fail = [0u8; <u8 as Pod>::SIZE - 1];
         
-        assert_eq!(<u8 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<u8 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<u8 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<u8 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
 
         // Write success
         let mut buffer_write1 = [0u8; <u8 as Pod>::SIZE * 2];
@@ -991,8 +1021,8 @@ mod tests {
         // Write fail
         let mut buffer_write_fail= [0u8; <u8 as Pod>::SIZE - 1];
 
-        assert_eq!(<u8 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<u8 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<u8 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<u8 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
     }
 
     #[test]
@@ -1013,8 +1043,8 @@ mod tests {
         // Read fail
         let buffer_read_fail = [0u8; <u16 as Pod>::SIZE - 1];
         
-        assert_eq!(<u16 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<u16 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<u16 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<u16 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
 
         // Write success
         let mut buffer_write1 = [0u8; <u16 as Pod>::SIZE * 2];
@@ -1045,8 +1075,8 @@ mod tests {
         // Write fail
         let mut buffer_write_fail= [0u8; <u16 as Pod>::SIZE - 1];
 
-        assert_eq!(<u16 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<u16 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<u16 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<u16 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
     }
 
     #[test]
@@ -1067,8 +1097,8 @@ mod tests {
         // Read fail
         let buffer_read_fail = [0u8; <u32 as Pod>::SIZE - 1];
         
-        assert_eq!(<u32 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<u32 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<u32 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<u32 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
 
         // Write success
         let mut buffer_write1 = [0u8; <u32 as Pod>::SIZE * 2];
@@ -1099,8 +1129,8 @@ mod tests {
         // Write fail
         let mut buffer_write_fail = [0u8; <u32 as Pod>::SIZE - 1];
 
-        assert_eq!(<u32 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<u32 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<u32 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<u32 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
     }
 
     #[test]
@@ -1121,8 +1151,8 @@ mod tests {
         // Read fail
         let buffer_read_fail = [0u8; <u64 as Pod>::SIZE - 1];
         
-        assert_eq!(<u64 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<u64 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<u64 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<u64 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
 
         // Write success
         let mut buffer_write1 = [0u8; <u64 as Pod>::SIZE * 2];
@@ -1153,8 +1183,8 @@ mod tests {
         // Write fail
         let mut buffer_write_fail = [0u8; <u64 as Pod>::SIZE - 1];
 
-        assert_eq!(<u64 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<u64 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<u64 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<u64 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
     }
 
     #[test]
@@ -1187,8 +1217,8 @@ mod tests {
         // Read fail
         let buffer_read_fail = [0u8; <u128 as Pod>::SIZE - 1];
         
-        assert_eq!(<u128 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<u128 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<u128 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<u128 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
 
         // Write success
         let mut buffer_write1 = [0u8; <u128 as Pod>::SIZE * 2];
@@ -1219,8 +1249,8 @@ mod tests {
         // Write fail
         let mut buffer_write_fail = [0u8; <u128 as Pod>::SIZE - 1];
 
-        assert_eq!(<u128 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<u128 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<u128 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<u128 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
     }
 
     #[test]
@@ -1240,8 +1270,8 @@ mod tests {
         // Read fail
         let buffer_read_fail = [0u8; <i8 as Pod>::SIZE - 1];
         
-        assert_eq!(<i8 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<i8 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<i8 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<i8 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
 
         // Write success
         let mut buffer_write1 = [0u8; <i8 as Pod>::SIZE * 2];
@@ -1272,8 +1302,8 @@ mod tests {
         // Write fail
         let mut buffer_write_fail = [0u8; <i8 as Pod>::SIZE - 1];
 
-        assert_eq!(<i8 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<i8 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<i8 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<i8 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
     }
 
     #[test]
@@ -1296,8 +1326,8 @@ mod tests {
         // Read fail
         let buffer_read_fail = [0u8; <i16 as Pod>::SIZE - 1];
         
-        assert_eq!(<i16 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<i16 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<i16 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<i16 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
 
         // Write success
         let mut buffer_write1 = [0u8; <i16 as Pod>::SIZE * 2];
@@ -1328,8 +1358,8 @@ mod tests {
         // Write fail
         let mut buffer_write_fail = [0u8; <i16 as Pod>::SIZE - 1];
 
-        assert_eq!(<i16 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<i16 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<i16 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<i16 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
     }
 
     #[test]
@@ -1352,8 +1382,8 @@ mod tests {
         // Read fail
         let buffer_read_fail = [0u8; <i32 as Pod>::SIZE - 1];
         
-        assert_eq!(<i32 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<i32 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<i32 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<i32 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
 
         // Write success
         let mut buffer_write1 = [0u8; <i32 as Pod>::SIZE * 2];
@@ -1384,8 +1414,8 @@ mod tests {
         // Write fail
         let mut buffer_write_fail = [0u8; <i32 as Pod>::SIZE - 1];
 
-        assert_eq!(<i32 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<i32 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<i32 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<i32 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
     }
 
     #[test]
@@ -1408,8 +1438,8 @@ mod tests {
         // Read fail
         let buffer_read_fail = [0u8; <i64 as Pod>::SIZE - 1];
         
-        assert_eq!(<i64 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<i64 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<i64 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<i64 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
 
         // Write success
         let mut buffer_write1 = [0u8; <i64 as Pod>::SIZE * 2];
@@ -1440,8 +1470,8 @@ mod tests {
         // Write fail
         let mut buffer_write_fail = [0u8; <i64 as Pod>::SIZE - 1];
 
-        assert_eq!(<i64 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<i64 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<i64 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<i64 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
     }
 
     #[test]
@@ -1476,8 +1506,8 @@ mod tests {
         // Read fail
         let buffer_read_fail = [0u8; <i128 as Pod>::SIZE - 1];
         
-        assert_eq!(<i128 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<i128 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<i128 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<i128 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
 
         // Write success
         let mut buffer_write1 = [0u8; <i128 as Pod>::SIZE * 2];
@@ -1508,8 +1538,8 @@ mod tests {
         // Write fail
         let mut buffer_write_fail = [0u8; <i128 as Pod>::SIZE - 1];
 
-        assert_eq!(<i128 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<i128 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<i128 as Pod>::to_le_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<i128 as Pod>::to_be_bytes(&1, &mut buffer_write_fail), Err(PodError::OutOfSpace));
     }
 
     #[test]
@@ -1525,8 +1555,8 @@ mod tests {
         // Read fail
         let buffer_read_fail = [0u8; <f32 as Pod>::SIZE - 1];
         
-        assert_eq!(<f32 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<f32 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<f32 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<f32 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
 
         // Write success
         let mut buffer_write1 = [0u8; <f32 as Pod>::SIZE * 2];
@@ -1557,8 +1587,8 @@ mod tests {
         // Write fail
         let mut buffer_write_fail = [0u8; <f32 as Pod>::SIZE - 1];
 
-        assert_eq!(<f32 as Pod>::to_le_bytes(&1f32, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<f32 as Pod>::to_be_bytes(&1f32, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<f32 as Pod>::to_le_bytes(&1f32, &mut buffer_write_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<f32 as Pod>::to_be_bytes(&1f32, &mut buffer_write_fail), Err(PodError::OutOfSpace));
     }
 
     #[test]
@@ -1577,8 +1607,8 @@ mod tests {
         // Read fail
         let buffer_read_fail = [0u8; <f64 as Pod>::SIZE - 1];
         
-        assert_eq!(<f64 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<f64 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<f64 as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<f64 as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
 
         // Write success
         let mut buffer_write1 = [0u8; <f64 as Pod>::SIZE * 2];
@@ -1609,7 +1639,67 @@ mod tests {
         // Write fail
         let mut buffer_write_fail = [0u8; <f64 as Pod>::SIZE - 1];
 
-        assert_eq!(<f64 as Pod>::to_le_bytes(&1f64, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
-        assert_eq!(<f64 as Pod>::to_be_bytes(&1f64, &mut buffer_write_fail), Err(PodError::NotEnoughSpace));
+        assert_eq!(<f64 as Pod>::to_le_bytes(&1f64, &mut buffer_write_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<f64 as Pod>::to_be_bytes(&1f64, &mut buffer_write_fail), Err(PodError::OutOfSpace));
+    }
+
+    #[test]
+    fn pod_arrays() {
+        // Read success
+        let buffer_read = [1u8, 0u8, 0u8, 1u8];
+        
+        assert_eq!(<[bool; 2] as Pod>::from_le_bytes(&buffer_read), Ok([true, false]));
+        assert_eq!(<[bool; 2] as Pod>::from_be_bytes(&buffer_read), Ok([true, false]));
+        assert_eq!(
+            <[bool; 2] as Pod>::from_le_bytes(&buffer_read[<[bool; 2] as Pod>::SIZE..]), 
+            Ok([false, true])
+        );
+        assert_eq!(
+            <[bool; 2] as Pod>::from_be_bytes(&buffer_read[<[bool; 2] as Pod>::SIZE..]), 
+            Ok([false, true])
+        );
+
+        // Read fail
+        let buffer_read_fail = [0u8; <[bool; 2] as Pod>::SIZE - 1];
+        
+        assert_eq!(<[bool; 2] as Pod>::from_le_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<[bool; 2] as Pod>::from_be_bytes(&buffer_read_fail), Err(PodError::OutOfSpace));
+
+        let buffer_read_fail_out_of_range = [2u8, 0u8];
+
+        assert_eq!(<[bool; 2] as Pod>::from_le_bytes(&buffer_read_fail_out_of_range), Err(PodError::OutOfRange));
+        assert_eq!(<[bool; 2] as Pod>::from_be_bytes(&buffer_read_fail_out_of_range), Err(PodError::OutOfRange));
+
+        // Write success
+        let mut buffer_write1 = [0u8; <[bool; 2] as Pod>::SIZE * 2];
+        let mut buffer_write2 = [1u8; <[bool; 2] as Pod>::SIZE * 2];
+        
+        assert_eq!(
+            <[bool; 2] as Pod>::to_le_bytes(&[true, false], &mut buffer_write1), 
+            Ok(<[bool; 2] as Pod>::SIZE)
+        );
+        assert_eq!(
+            <[bool; 2] as Pod>::to_be_bytes(&[true, false], &mut buffer_write1[<[bool; 2] as Pod>::SIZE..]), 
+            Ok(<[bool; 2] as Pod>::SIZE)
+        );
+        assert_eq!(
+            <[bool; 2] as Pod>::to_le_bytes(&[false, true], &mut buffer_write2), 
+            Ok(<[bool; 2] as Pod>::SIZE)
+        );
+        assert_eq!(
+            <[bool; 2] as Pod>::to_be_bytes(&[false, true], &mut buffer_write2[<[bool; 2] as Pod>::SIZE..]), 
+            Ok(<[bool; 2] as Pod>::SIZE)
+        );
+
+        assert_eq!(&buffer_write1[0..<[bool; 2] as Pod>::SIZE], &buffer_read[0..<[bool; 2] as Pod>::SIZE]);
+        assert_eq!(&buffer_write1[<[bool; 2] as Pod>::SIZE..], &buffer_read[0..<[bool; 2] as Pod>::SIZE]);
+        assert_eq!(&buffer_write2[0..<[bool; 2] as Pod>::SIZE], &buffer_read[<[bool; 2] as Pod>::SIZE..]);
+        assert_eq!(&buffer_write2[<[bool; 2] as Pod>::SIZE..], &buffer_read[<[bool; 2] as Pod>::SIZE..]);
+
+        // Write fail
+        let mut buffer_write_fail = [0u8; <[bool; 2] as Pod>::SIZE - 1];
+
+        assert_eq!(<[bool; 2] as Pod>::to_le_bytes(&[false, false], &mut buffer_write_fail), Err(PodError::OutOfSpace));
+        assert_eq!(<[bool; 2] as Pod>::to_be_bytes(&[false, false], &mut buffer_write_fail), Err(PodError::OutOfSpace));
     }
 }
