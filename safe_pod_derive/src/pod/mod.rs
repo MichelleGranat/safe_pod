@@ -134,6 +134,7 @@ impl DerivePodStruct {
             impl Pod for #name {
                 const SIZE: usize = #(#size_expr)+*;
 
+                #[inline]
                 fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
                     if buffer.len() < Self::SIZE {
                         return Err(PodError::NotEnoughSpace);
@@ -146,6 +147,7 @@ impl DerivePodStruct {
                     Ok(Self { #(#field_names),* })
                 }
 
+                #[inline]
                 fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
                     if buffer.len() < Self::SIZE {
                         return Err(PodError::NotEnoughSpace);
@@ -158,6 +160,7 @@ impl DerivePodStruct {
                     Ok(Self { #(#field_names),* })
                 }
 
+                #[inline]
                 fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
                     if buffer.len() < Self::SIZE {
                         return Err(PodError::NotEnoughSpace);
@@ -170,6 +173,7 @@ impl DerivePodStruct {
                     Ok(bytes)
                 }
 
+                #[inline]
                 fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
                     if buffer.len() < Self::SIZE {
                         return Err(PodError::NotEnoughSpace);

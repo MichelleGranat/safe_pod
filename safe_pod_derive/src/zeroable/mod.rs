@@ -82,6 +82,7 @@ impl DeriveZeroableStruct {
 
         quote! {
             impl Zeroable for #name {
+                #[inline]
                 fn zeroed() -> Self {
                     Self { #(#zeroed_fields),* }
                 }
