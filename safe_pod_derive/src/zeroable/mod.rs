@@ -2,6 +2,8 @@ use proc_macro2::TokenStream;
 use quote::{quote, quote_spanned, ToTokens};
 use syn::{spanned::Spanned, AttrStyle, Data, DeriveInput, Error, Expr, Fields, Ident, Lit, Type};
 
+use crate::shared::repr::Repr;
+
 /// Implementation of derive macro for Zeroable trait
 pub fn derive_zeroable_impl(input: DeriveInput) -> TokenStream {
     // If the type that derives Zeroable is a union
@@ -61,18 +63,9 @@ pub fn derive_zeroable_impl(input: DeriveInput) -> TokenStream {
                 // Check that repr is primitive
                 if let Err(e) = attribute.parse_nested_meta(
                     |meta| {
-                        if meta.path.is_ident("u8") { return Ok(()) }
-                        if meta.path.is_ident("u16") { return Ok(()) }
-                        if meta.path.is_ident("u32") { return Ok(()) }
-                        if meta.path.is_ident("u64") { return Ok(()) }
-                        if meta.path.is_ident("u128") { return Ok(()) }
-                        if meta.path.is_ident("usize") { return Ok(()) }
-                        if meta.path.is_ident("i8") { return Ok(()) }
-                        if meta.path.is_ident("i16") { return Ok(()) }
-                        if meta.path.is_ident("i32") { return Ok(()) }
-                        if meta.path.is_ident("i64") { return Ok(()) }
-                        if meta.path.is_ident("i128") { return Ok(()) }
-                        if meta.path.is_ident("isize") { return Ok(()) }
+                        if Repr::from_path(meta.path.clone()).is_zeroable() {
+                            return Ok(())
+                        }
 
                         Err(meta.error("Unsupported representation"))
                     }

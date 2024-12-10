@@ -1,5 +1,6 @@
 //! Derive macros for ``safe_pod`` crate.
 
+mod shared;
 mod zeroable;
 mod pod;
 
