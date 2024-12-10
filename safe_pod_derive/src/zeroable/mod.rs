@@ -74,14 +74,14 @@ impl DeriveZeroableStruct {
             let ty_span = t.span();
             // Add zeroing
             zeroed_fields.push(
-                quote_spanned!(ty_span => #n: <#t as Zeroable>::zeroed())
+                quote_spanned!(ty_span => #n: <#t as safe_pod::Zeroable>::zeroed())
             );
         }
 
         let name = &self.name;
 
         quote! {
-            impl Zeroable for #name {
+            impl safe_pod::Zeroable for #name {
                 #[inline]
                 fn zeroed() -> Self {
                     Self { #(#zeroed_fields),* }
