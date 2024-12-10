@@ -58,6 +58,7 @@ pub fn derive_zeroable_impl(input: DeriveInput) -> TokenStream {
 
             // If path is repr
             if attribute.path().is_ident("repr") {
+                // Check that repr is primitive
                 if let Err(e) = attribute.parse_nested_meta(
                     |meta| {
                         if meta.path.is_ident("u8") { return Ok(()) }
@@ -65,11 +66,13 @@ pub fn derive_zeroable_impl(input: DeriveInput) -> TokenStream {
                         if meta.path.is_ident("u32") { return Ok(()) }
                         if meta.path.is_ident("u64") { return Ok(()) }
                         if meta.path.is_ident("u128") { return Ok(()) }
+                        if meta.path.is_ident("usize") { return Ok(()) }
                         if meta.path.is_ident("i8") { return Ok(()) }
                         if meta.path.is_ident("i16") { return Ok(()) }
                         if meta.path.is_ident("i32") { return Ok(()) }
                         if meta.path.is_ident("i64") { return Ok(()) }
                         if meta.path.is_ident("i128") { return Ok(()) }
+                        if meta.path.is_ident("isize") { return Ok(()) }
 
                         Err(meta.error("Unsupported representation"))
                     }
