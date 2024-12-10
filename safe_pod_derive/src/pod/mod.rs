@@ -94,36 +94,36 @@ impl DerivePodStruct {
 
             // Add size expr
             size_expr.push(
-                quote_spanned!(ty_span => <#t as Pod>::SIZE)
+                quote_spanned!(ty_span => <#t as safe_pod::Pod>::SIZE)
             );
 
             // Add from_le_bytes
             from_le_bytes_expr.push(
                 quote_spanned!(ty_span => 
-                    let #n = <#t as Pod>::from_le_bytes(&buffer[bytes..])?;
-                    bytes += <#t as Pod>::SIZE;
+                    let #n = <#t as safe_pod::Pod>::from_le_bytes(&buffer[bytes..])?;
+                    bytes += <#t as safe_pod::Pod>::SIZE;
                 )
             );
 
             // Add from_be_bytes
             from_be_bytes_expr.push(
                 quote_spanned!(ty_span => 
-                    let #n = <#t as Pod>::from_be_bytes(&buffer[bytes..])?;
-                    bytes += <#t as Pod>::SIZE;
+                    let #n = <#t as safe_pod::Pod>::from_be_bytes(&buffer[bytes..])?;
+                    bytes += <#t as safe_pod::Pod>::SIZE;
                 )
             );
 
             // Add to_le_bytes
             to_le_bytes_expr.push(
                 quote_spanned!(name_span => 
-                    bytes += Pod::to_le_bytes(&self.#n, &mut buffer[bytes..])?;
+                    bytes += safe_pod::Pod::to_le_bytes(&self.#n, &mut buffer[bytes..])?;
                 )
             );
 
             // Add to_be_bytes
             to_be_bytes_expr.push(
                 quote_spanned!(name_span => 
-                    bytes += Pod::to_be_bytes(&self.#n, &mut buffer[bytes..])?;
+                    bytes += safe_pod::Pod::to_be_bytes(&self.#n, &mut buffer[bytes..])?;
                 )
             );
         }
@@ -131,13 +131,13 @@ impl DerivePodStruct {
         let name = &self.name;
 
         quote! {
-            impl Pod for #name {
+            impl safe_pod::Pod for #name {
                 const SIZE: usize = #(#size_expr)+*;
 
                 #[inline]
-                fn from_le_bytes(buffer: &[u8]) -> Result<Self, PodError> {
+                fn from_le_bytes(buffer: &[u8]) -> Result<Self, safe_pod::PodError> {
                     if buffer.len() < Self::SIZE {
-                        return Err(PodError::OutOfSpace);
+                        return Err(safe_pod::PodError::OutOfSpace);
                     }
 
                     let mut bytes = 0usize;
@@ -148,9 +148,9 @@ impl DerivePodStruct {
                 }
 
                 #[inline]
-                fn from_be_bytes(buffer: &[u8]) -> Result<Self, PodError> {
+                fn from_be_bytes(buffer: &[u8]) -> Result<Self, safe_pod::PodError> {
                     if buffer.len() < Self::SIZE {
-                        return Err(PodError::OutOfSpace);
+                        return Err(safe_pod::PodError::OutOfSpace);
                     }
 
                     let mut bytes = 0usize;
@@ -161,9 +161,9 @@ impl DerivePodStruct {
                 }
 
                 #[inline]
-                fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
+                fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, safe_pod::PodError> {
                     if buffer.len() < Self::SIZE {
-                        return Err(PodError::OutOfSpace);
+                        return Err(safe_pod::PodError::OutOfSpace);
                     }
 
                     let mut bytes = 0usize;
@@ -174,9 +174,9 @@ impl DerivePodStruct {
                 }
 
                 #[inline]
-                fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, PodError> {
+                fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, safe_pod::PodError> {
                     if buffer.len() < Self::SIZE {
-                        return Err(PodError::OutOfSpace);
+                        return Err(safe_pod::PodError::OutOfSpace);
                     }
 
                     let mut bytes = 0usize;
