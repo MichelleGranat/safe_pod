@@ -43,5 +43,4 @@ println!("Foo wrote {} bytes to byte buffer: {:#?}", bytes_written, bytes_from_f
 
 # Upcoming
 In following versions more primitive types will be supported,
-some ``std`` types will be supported, and the derive macros will
-be more flexible.
+some ``std`` types will be supported too, and the derive macros will support `enum` types.
