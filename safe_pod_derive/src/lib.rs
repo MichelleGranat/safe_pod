@@ -22,7 +22,7 @@ use syn::{parse_macro_input, DeriveInput};
 /// 
 /// println!("Foo zeroed: {:#?}", zeroed_foo);
 /// ```
-#[proc_macro_derive(Zeroable)]
+#[proc_macro_derive(Zeroable, attributes(zero))]
 pub fn derive_zeroable(input: TokenStream) -> TokenStream {
     zeroable::derive_zeroable_impl(
         parse_macro_input!(input as DeriveInput)
@@ -47,7 +47,7 @@ pub fn derive_zeroable(input: TokenStream) -> TokenStream {
 /// println!("Foo from bytes: {:#?}", foo_from_bytes);
 /// println!("Foo wrote {} bytes to byte buffer: {:#?}", bytes_written, bytes_from_foo);
 /// ```
-#[proc_macro_derive(Pod)]
+#[proc_macro_derive(Pod, attributes(pod))]
 pub fn derive_pod(input: TokenStream) -> TokenStream {
     pod::derive_pod_impl(
         parse_macro_input!(input as DeriveInput)

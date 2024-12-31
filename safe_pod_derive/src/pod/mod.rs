@@ -1,6 +1,14 @@
-use proc_macro2::TokenStream;
+// Define modules
+mod r#struct;
+// mod r#enum;
+
+use std::str::FromStr;
+
+use proc_macro2::{Literal, Span, TokenStream};
 use quote::{quote, quote_spanned, ToTokens};
-use syn::{spanned::Spanned, Data, DeriveInput, Error, Fields, Ident, Type};
+use syn::{spanned::Spanned, AttrStyle, Data, DeriveInput, Error, Expr, Fields, Ident, Type};
+
+use crate::shared::repr::Repr;
 
 /// Implementation of derive macro for Pod trait
 pub fn derive_pod_impl(input: DeriveInput) -> TokenStream {
@@ -9,183 +17,344 @@ pub fn derive_pod_impl(input: DeriveInput) -> TokenStream {
     if let Data::Union(d) = &input.data {
         return Error::new(
             d.union_token.span,
-            "Union types cannot be Pod"
+            "Union types cannot derive Pod"
         ).to_compile_error();
     }
 
     // If the type that derives Pod is a struct
     if let Data::Struct(d) = &input.data {
         let name = input.ident;
-        let mut fields: Vec<(Ident, Type)> = Vec::new();
+        return r#struct::derive_struct_impl(name, d);
+    //     let mut fields: Vec<(Ident, Type)> = Vec::new();
 
-        match &d.fields {
-            Fields::Unit => {
-                return Error::new(
-                    name.span(),
-                    "Unit structs cannot be Pod YET!"
-                ).to_compile_error();
-            },
-            Fields::Unnamed(f) => {
-                return Error::new(
-                    f.span(),
-                    "Structs with unnamed fields cannot derive Pod"
-                ).to_compile_error();
-            },
-            Fields::Named(f) => {
-                for field in &f.named {
-                    fields.push(
-                        (field.ident.clone().unwrap(), field.ty.clone())
-                    );
-                }
-            }
-        }
+    //     match &d.fields {
+    //         Fields::Unit => {
+    //             return Error::new(
+    //                 name.span(),
+    //                 "Unit structs cannot be Pod YET!"
+    //             ).to_compile_error();
+    //         },
+    //         Fields::Unnamed(f) => {
+    //             return Error::new(
+    //                 f.span(),
+    //                 "Structs with unnamed fields cannot derive Pod"
+    //             ).to_compile_error();
+    //         },
+    //         Fields::Named(f) => {
+    //             for field in &f.named {
+    //                 fields.push(
+    //                     (field.ident.clone().unwrap(), field.ty.clone())
+    //                 );
+    //             }
+    //         }
+    //     }
 
-        return DerivePodStruct {
-            name, 
-            fields
-        }.implementation();
+    //     return DerivePodStruct {
+    //         name, 
+    //         fields
+    //     }.implementation();
     }
 
     // If the type that derives Pod is an enum
     if let Data::Enum(d) = &input.data {
+        // // Get representation and make sure its supported
+        // let mut repr = Repr::NotSupported;
+
+        // for attribute in input.attrs {
+        //     // Ignore inner attributes
+        //     if let AttrStyle::Inner(_) = attribute.style {
+        //         continue;
+        //     }
+
+        //     // If path is repr
+        //     if attribute.path().is_ident("repr") {
+        //         // Check that repr is primitive
+        //         if let Err(e) = attribute.parse_nested_meta(
+        //             |meta| {
+        //                 // Assign the propper representation to repr
+        //                 repr = Repr::from_path(meta.path.clone());
+
+        //                 // If representation is supported
+        //                 if repr.is_pod() {
+        //                     return Ok(());
+        //                 }
+
+        //                 Err(meta.error("Unsupported representation"))
+        //             }
+        //         ) {
+        //             return e.to_compile_error();
+        //         }
+
+        //         // Break because #[repr] was found
+        //         break;
+        //     }
+        // }
+
         return Error::new(
             d.enum_token.span,
-            "enum types cannot cannot derive Pod YET"
+            "Enums cannot derive Pod"
         ).to_compile_error();
+
+        // Get name and init variants vector
+        // let name = input.ident;
+        // return r#enum::derive_enum_impl(name, d);
+
+        // let mut variants: Vec<(Ident, Span)> = Vec::new();
+
+        // // Go over variants
+        // for variant in &d.variants {
+        //     // Match fields
+        //     match &variant.fields {
+        //         // If variant is not unit
+        //         Fields::Unnamed(f) => {
+        //             return Error::new(
+        //                 f.span(),
+        //                 "Non unit-only Enums cannot derive Pod YET"
+        //             ).to_compile_error();
+        //         },
+        //         Fields::Named(f) => {
+        //             return Error::new(
+        //                 f.span(),
+        //                 "Non unit-only Enums cannot derive Pod YET"
+        //             ).to_compile_error();
+        //         },
+        //         // If variant is unit
+        //         Fields::Unit => {
+        //             // Push variant 
+        //             variants.push((
+        //                 variant.ident.clone(),
+        //                 variant.span()
+        //             ));
+        //         },
+        //     }
+        // }
+
+        // return DerivePodEnum {
+        //     repr,
+        //     name,
+        //     variants
+        // }.implementation()
     }
 
     return TokenStream::new();
 }
 
-/// A representation of a struct 
-/// that derives Pod trait
-pub struct DerivePodStruct {
-    name: Ident,
-    fields: Vec<(Ident, Type)>,
-}
+// /// A representation of a struct 
+// /// that derives Pod trait
+// pub struct DerivePodStruct {
+//     name: Ident,
+//     fields: Vec<(Ident, Type)>,
+// }
 
-impl DerivePodStruct {
-    /// Returns the Pod implementation for the struct
-    pub fn implementation(self) -> TokenStream {
-        // List of field names
-        let mut field_names: Vec<TokenStream> = Vec::new();
+// impl DerivePodStruct {
+//     /// Returns the Pod implementation for the struct
+//     pub fn implementation(self) -> TokenStream {
+//         // List of field names
+//         let mut field_names: Vec<TokenStream> = Vec::new();
 
-        // Expression for SIZE
-        let mut size_expr: Vec<TokenStream> = Vec::new();
+//         // Expression for SIZE
+//         let mut size_expr: Vec<TokenStream> = Vec::new();
 
-        // Expressions for from_le_bytes
-        let mut from_le_bytes_expr: Vec<TokenStream> = Vec::new();
+//         // Expressions for from_le_bytes
+//         let mut from_le_bytes_expr: Vec<TokenStream> = Vec::new();
 
-        // Expressions for from_be_bytes
-        let mut from_be_bytes_expr: Vec<TokenStream> = Vec::new();
+//         // Expressions for from_be_bytes
+//         let mut from_be_bytes_expr: Vec<TokenStream> = Vec::new();
 
-        // Expressions for to_le_bytes
-        let mut to_le_bytes_expr: Vec<TokenStream> = Vec::new();
+//         // Expressions for to_le_bytes
+//         let mut to_le_bytes_expr: Vec<TokenStream> = Vec::new();
 
-        // Expressions for to_be_bytes
-        let mut to_be_bytes_expr: Vec<TokenStream> = Vec::new();
+//         // Expressions for to_be_bytes
+//         let mut to_be_bytes_expr: Vec<TokenStream> = Vec::new();
 
-        for (n, t) in self.fields {
-            // Add field name
-            field_names.push(quote!(#n));
+//         for (n, t) in self.fields {
+//             // Add field name
+//             field_names.push(quote!(#n));
 
-            let ty_span = t.span();
-            let name_span = n.span();
+//             let ty_span = t.span();
+//             let name_span = n.span();
 
-            // Add size expr
-            size_expr.push(
-                quote_spanned!(ty_span => <#t as safe_pod::Pod>::SIZE)
-            );
+//             // Add size expr
+//             size_expr.push(
+//                 quote_spanned!(ty_span => <#t as safe_pod::Pod>::SIZE)
+//             );
 
-            // Add from_le_bytes
-            from_le_bytes_expr.push(
-                quote_spanned!(ty_span => 
-                    let #n = <#t as safe_pod::Pod>::from_le_bytes(&buffer[bytes..])?;
-                    bytes += <#t as safe_pod::Pod>::SIZE;
-                )
-            );
+//             // Add from_le_bytes
+//             from_le_bytes_expr.push(
+//                 quote_spanned!(ty_span => 
+//                     let #n = <#t as safe_pod::Pod>::from_le_bytes(&buffer[bytes..])?;
+//                     bytes += <#t as safe_pod::Pod>::SIZE;
+//                 )
+//             );
 
-            // Add from_be_bytes
-            from_be_bytes_expr.push(
-                quote_spanned!(ty_span => 
-                    let #n = <#t as safe_pod::Pod>::from_be_bytes(&buffer[bytes..])?;
-                    bytes += <#t as safe_pod::Pod>::SIZE;
-                )
-            );
+//             // Add from_be_bytes
+//             from_be_bytes_expr.push(
+//                 quote_spanned!(ty_span => 
+//                     let #n = <#t as safe_pod::Pod>::from_be_bytes(&buffer[bytes..])?;
+//                     bytes += <#t as safe_pod::Pod>::SIZE;
+//                 )
+//             );
 
-            // Add to_le_bytes
-            to_le_bytes_expr.push(
-                quote_spanned!(name_span => 
-                    bytes += safe_pod::Pod::to_le_bytes(&self.#n, &mut buffer[bytes..])?;
-                )
-            );
+//             // Add to_le_bytes
+//             to_le_bytes_expr.push(
+//                 quote_spanned!(name_span => 
+//                     bytes += safe_pod::Pod::to_le_bytes(&self.#n, &mut buffer[bytes..])?;
+//                 )
+//             );
 
-            // Add to_be_bytes
-            to_be_bytes_expr.push(
-                quote_spanned!(name_span => 
-                    bytes += safe_pod::Pod::to_be_bytes(&self.#n, &mut buffer[bytes..])?;
-                )
-            );
-        }
+//             // Add to_be_bytes
+//             to_be_bytes_expr.push(
+//                 quote_spanned!(name_span => 
+//                     bytes += safe_pod::Pod::to_be_bytes(&self.#n, &mut buffer[bytes..])?;
+//                 )
+//             );
+//         }
 
-        let name = &self.name;
+//         let name = &self.name;
 
-        quote! {
-            impl safe_pod::Pod for #name {
-                const SIZE: usize = #(#size_expr)+*;
+//         quote! {
+//             impl safe_pod::Pod for #name {
+//                 const SIZE: usize = #(#size_expr)+*;
 
-                #[inline]
-                fn from_le_bytes(buffer: &[u8]) -> Result<Self, safe_pod::PodError> {
-                    if buffer.len() < Self::SIZE {
-                        return Err(safe_pod::PodError::OutOfSpace);
-                    }
+//                 #[inline]
+//                 fn from_le_bytes(buffer: &[u8]) -> Result<Self, safe_pod::PodError> {
+//                     if buffer.len() < Self::SIZE {
+//                         return Err(safe_pod::PodError::OutOfSpace);
+//                     }
 
-                    let mut bytes = 0usize;
+//                     let mut bytes = 0usize;
 
-                    #(#from_le_bytes_expr)*
+//                     #(#from_le_bytes_expr)*
 
-                    Ok(Self { #(#field_names),* })
-                }
+//                     Ok(Self { #(#field_names),* })
+//                 }
 
-                #[inline]
-                fn from_be_bytes(buffer: &[u8]) -> Result<Self, safe_pod::PodError> {
-                    if buffer.len() < Self::SIZE {
-                        return Err(safe_pod::PodError::OutOfSpace);
-                    }
+//                 #[inline]
+//                 fn from_be_bytes(buffer: &[u8]) -> Result<Self, safe_pod::PodError> {
+//                     if buffer.len() < Self::SIZE {
+//                         return Err(safe_pod::PodError::OutOfSpace);
+//                     }
 
-                    let mut bytes = 0usize;
+//                     let mut bytes = 0usize;
 
-                    #(#from_be_bytes_expr)*
+//                     #(#from_be_bytes_expr)*
 
-                    Ok(Self { #(#field_names),* })
-                }
+//                     Ok(Self { #(#field_names),* })
+//                 }
 
-                #[inline]
-                fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, safe_pod::PodError> {
-                    if buffer.len() < Self::SIZE {
-                        return Err(safe_pod::PodError::OutOfSpace);
-                    }
+//                 #[inline]
+//                 fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, safe_pod::PodError> {
+//                     if buffer.len() < Self::SIZE {
+//                         return Err(safe_pod::PodError::OutOfSpace);
+//                     }
 
-                    let mut bytes = 0usize;
+//                     let mut bytes = 0usize;
 
-                    #(#to_le_bytes_expr)*
+//                     #(#to_le_bytes_expr)*
 
-                    Ok(bytes)
-                }
+//                     Ok(bytes)
+//                 }
 
-                #[inline]
-                fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, safe_pod::PodError> {
-                    if buffer.len() < Self::SIZE {
-                        return Err(safe_pod::PodError::OutOfSpace);
-                    }
+//                 #[inline]
+//                 fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, safe_pod::PodError> {
+//                     if buffer.len() < Self::SIZE {
+//                         return Err(safe_pod::PodError::OutOfSpace);
+//                     }
 
-                    let mut bytes = 0usize;
+//                     let mut bytes = 0usize;
 
-                    #(#to_be_bytes_expr)*
+//                     #(#to_be_bytes_expr)*
 
-                    Ok(bytes)
-                }
-            }
-        }.to_token_stream()
-    }
-}
+//                     Ok(bytes)
+//                 }
+//             }
+//         }.to_token_stream()
+//     }
+// }
+
+// pub struct DerivePodEnum {
+//     repr: Repr,
+//     name: Ident,
+//     variants: Vec<(Ident, Span)>
+// }
+
+// impl DerivePodEnum {
+//     /// Returns the Zeroable implementation for the enum
+//     pub fn implementation(self) -> TokenStream {
+//         // Get basic info
+//         let name = &self.name;
+//         let size_expr = Literal::from_str(self.repr.size()).unwrap(); // Can't fail
+//         let repr_ident: TokenStream = self.repr.ident().parse().unwrap(); // Can't fail
+//         let repr_byte_array_expr = self.repr.byte_array("buffer");
+
+//         // Initialize zero variant to first variant
+//         let mut variant_match_exprs: Vec<TokenStream> = Vec::new();
+
+//         // Check to see if another variant has a discriminant of zero
+//         for (variant, span) in self.variants {
+//             variant_match_exprs.push(quote_spanned! {span =>
+//                 #variant as #repr_ident => { Ok(Self::#variant) }
+//             });
+//         }
+
+//         quote! {
+//             impl safe_pod::Pod for #name {
+//                 const SIZE: usize = #size_expr;
+
+//                 #[inline]
+//                 fn from_le_bytes(buffer: &[u8]) -> Result<Self, safe_pod::PodError> {
+//                     if buffer.len() < Self::SIZE {
+//                         return Err(safe_pod::PodError::OutOfSpace);
+//                     }
+
+//                     let num = #repr_ident::from_le_bytes(#repr_byte_array_expr);
+
+//                     match num {
+//                         #(#variant_match_exprs),*
+//                         _ => { Err(safe_pod::PodError::OutOfRange) }
+//                     }
+//                 }
+
+//                 #[inline]
+//                 fn from_be_bytes(buffer: &[u8]) -> Result<Self, safe_pod::PodError> {
+//                     if buffer.len() < Self::SIZE {
+//                         return Err(safe_pod::PodError::OutOfSpace);
+//                     }
+
+//                     let num = #repr_ident::from_be_bytes(#repr_byte_array_expr);
+
+//                     match num {
+//                         #(#variant_match_exprs),*
+//                         _ => { Err(safe_pod::PodError::OutOfRange) }
+//                     }
+//                 }
+
+//                 #[inline]
+//                 fn to_le_bytes(&self, buffer: &mut [u8]) -> Result<usize, safe_pod::PodError> {
+//                     if buffer.len() < Self::SIZE {
+//                         return Err(safe_pod::PodError::OutOfSpace);
+//                     }
+
+//                     let mut bytes = (slef as #repr_ident).to_le_bytes();
+
+//                     buffer.copy_from_slice(&bytes);
+
+//                     Ok(Self::SIZE)
+//                 }
+
+//                 #[inline]
+//                 fn to_be_bytes(&self, buffer: &mut [u8]) -> Result<usize, safe_pod::PodError> {
+//                     if buffer.len() < Self::SIZE {
+//                         return Err(safe_pod::PodError::OutOfSpace);
+//                     }
+
+//                     let mut bytes = (slef as #repr_ident).to_be_bytes();
+
+//                     buffer.copy_from_slice(&bytes);
+
+//                     Ok(Self::SIZE)
+//                 }
+//             }
+//         }.to_token_stream()
+//     }
+// }
