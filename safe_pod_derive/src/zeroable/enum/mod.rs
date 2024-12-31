@@ -53,7 +53,7 @@ pub fn derive_enum_impl(name: Ident, enum_data: &DataEnum) -> TokenStream {
 
     return Error::new(
         name.span(),
-        "One field must have the \"zero\" attribute"
+        "One field must have the #[zero] attribute"
     ).to_compile_error();
 }
 
