@@ -138,7 +138,7 @@ pub fn derive_enum_impl(name: Ident, attributes: Vec<Attribute>, enum_data: &Dat
             fn from_le_bytes(buffer: &[u8]) -> Result<Self, safe_pod::PodError> {
                 let val = match <#repr as safe_pod::Pod>::from_le_bytes(buffer)? {
                     #(#from_le_expressions)*
-                    _ => return Err(safe_pod::PodError::OutOfRange);
+                    _ => { return Err(safe_pod::PodError::OutOfRange); }
                 };
 
                 Ok(val)
@@ -148,7 +148,7 @@ pub fn derive_enum_impl(name: Ident, attributes: Vec<Attribute>, enum_data: &Dat
             fn from_be_bytes(buffer: &[u8]) -> Result<Self, safe_pod::PodError> {
                 let val = match <#repr as safe_pod::Pod>::from_be_bytes(buffer)? {
                     #(#from_be_expressions)*
-                    _ => return Err(safe_pod::PodError::OutOfRange);
+                    _ => { return Err(safe_pod::PodError::OutOfRange); }
                 };
 
                 Ok(val)
@@ -162,9 +162,9 @@ pub fn derive_enum_impl(name: Ident, attributes: Vec<Attribute>, enum_data: &Dat
 
                 let val = match &self {
                     #(#to_le_expressions)*
-                }
+                };
 
-                safe_pod::Pod::to_le_bytes(val, &mut buffer)
+                safe_pod::Pod::to_le_bytes(&val, buffer)
             }
 
             #[inline]
@@ -175,9 +175,9 @@ pub fn derive_enum_impl(name: Ident, attributes: Vec<Attribute>, enum_data: &Dat
 
                 let val = match &self {
                     #(#to_be_expressions)*
-                }
+                };
 
-                safe_pod::Pod::to_be_bytes(val, &mut buffer)
+                safe_pod::Pod::to_be_bytes(&val, buffer)
             }
         }
     }
@@ -221,7 +221,7 @@ mod tests {
                     let val = match <u8 as safe_pod::Pod>::from_le_bytes(buffer)? {
                         0 => { Self::Foo },
                         1 => { Self::Bar },
-                        _ => return Err(safe_pod::PodError::OutOfRange);
+                        _ => { return Err(safe_pod::PodError::OutOfRange); }
                     };
     
                     Ok(val)
@@ -232,7 +232,7 @@ mod tests {
                     let val = match <u8 as safe_pod::Pod>::from_be_bytes(buffer)? {
                         0 => { Self::Foo },
                         1 => { Self::Bar },
-                        _ => return Err(safe_pod::PodError::OutOfRange);
+                        _ => { return Err(safe_pod::PodError::OutOfRange); }
                     };
     
                     Ok(val)
@@ -247,9 +247,9 @@ mod tests {
                     let val = match &self {
                         Self::Foo => { 0 },
                         Self::Bar => { 1 },
-                    }
+                    };
     
-                    safe_pod::Pod::to_le_bytes(val, &mut buffer)
+                    safe_pod::Pod::to_le_bytes(&val, buffer)
                 }
 
                 #[inline]
@@ -261,9 +261,9 @@ mod tests {
                     let val = match &self {
                         Self::Foo => { 0 },
                         Self::Bar => { 1 },
-                    }
+                    };
     
-                    safe_pod::Pod::to_be_bytes(val, &mut buffer)
+                    safe_pod::Pod::to_be_bytes(&val, buffer)
                 }
             }
         }.to_string();
