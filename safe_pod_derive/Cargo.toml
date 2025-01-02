@@ -14,5 +14,5 @@ doctest = false
 
 [dependencies]
 proc-macro2 = "1.0"
-syn = "2.0"
+syn = { version = "2.0", features = ["extra-traits"] }
 quote = "1.0"

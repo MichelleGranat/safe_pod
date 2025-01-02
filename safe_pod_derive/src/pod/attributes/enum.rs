@@ -1,10 +1,11 @@
-use syn::{punctuated::Punctuated, Attribute, Meta, Type, Token};
+use syn::{Attribute, Type};
 
 use super::utils;
 
 /// `pod` attribute struct for an enum
+#[derive(Debug, PartialEq, Eq)]
 pub struct EnumAttr {
-    repr: Option<Type>
+    pub repr: Option<Type>
 }
 
 impl EnumAttr {
@@ -13,38 +14,119 @@ impl EnumAttr {
         // Define fields
         let mut repr: Option<Type> = None;
 
-        // Go over attribute list
-        for attribute in attributes {
-            // If attribute is `pod`
-            if attribute.meta.path().is_ident("pod") {
-                // Get contents
-                let contents = match attribute.meta.require_list() {
-                    Ok(c) => c,
-                    Err(_) => return Err("pod attribute must be of shape #[pod(...)]")
-                };
+        // Get inner attributes
+        let attrs = match utils::get_pod(attributes) {
+            Ok(a) => a,
+            Err(e) => return Err(e)
+        };
 
-                // Parse content into attributes
-                let attrs = match contents.parse_args_with(
-                    Punctuated::<Meta, Token![,]>::parse_terminated
-                ) {
-                    Ok(a) => a,
-                    Err(_) => return Err("pod attribute values must be a comma separated list")
-                };
-
-                // Get attributes
-                repr = match utils::get_repr(&attrs) {
-                    Ok(r) => Some(r),
-                    Err(e) => match e {
-                        "not found" => None,
-                        _ => return Err(e)
-                    }
-                };
-
-                return Ok( EnumAttr { repr });
+        // Get attributes
+        repr = match utils::get_repr(&attrs) {
+            Ok(r) => Some(r),
+            Err(e) => match e {
+                "not found" => None,
+                _ => return Err(e)
             }
-        }
+        };
 
-        // Else return not found
-        return Err("not found");
+        return Ok( EnumAttr { repr });
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use proc_macro2::Span;
+    use syn::{parse2, DeriveInput, Ident, Path, TypePath};
+    use quote::quote;
+
+    use super::*;
+
+    #[test]
+    fn enum_attribute_success() {
+        // Define input
+        let input_stream = quote! {
+            #[pod(repr(u16), other(), other2 = val)]
+            struct Foo;
+        };
+
+        let input = parse2::<DeriveInput>(input_stream).unwrap().attrs;
+
+        // Define expected output
+        let expected_output = EnumAttr {
+            repr: Some(Type::Path(
+                TypePath {
+                    qself: None,
+                    path: Path::from(Ident::new("u16", Span::call_site()))
+                }
+            ))
+        };
+
+        // Output
+        let output = EnumAttr::from_attributes(&input).unwrap();
+
+        // Test
+        assert_eq!(expected_output, output)
+    }
+
+    #[test]
+    fn enum_attribute_success2() {
+        // Define input
+        let input_stream = quote! {
+            #[pod(other(), other2 = val)]
+            struct Foo;
+        };
+
+        let input = parse2::<DeriveInput>(input_stream).unwrap().attrs;
+
+        // Define expected output
+        let expected_output = EnumAttr {
+            repr: None
+        };
+
+        // Output
+        let output = EnumAttr::from_attributes(&input).unwrap();
+
+        // Test
+        assert_eq!(expected_output, output)
+    }
+
+    #[test]
+    fn enum_attribute_fail() {
+        // Define input
+        let input_stream = quote! {
+            #[pod(repr = u8)]
+            struct Foo;
+        };
+
+        let input = parse2::<DeriveInput>(input_stream).unwrap().attrs;
+
+        // Define expected output
+        let expected_output = Err("repr attribute must be of shape repr($type)");
+
+        // Output
+        let output = EnumAttr::from_attributes(&input);
+
+        // Test
+        assert_eq!(expected_output, output)
+    }
+
+    #[test]
+    fn enum_attribute_fail2() {
+        // Define input
+        let input_stream = quote! {
+            #[pod(repr(3))]
+            struct Foo;
+        };
+
+        let input = parse2::<DeriveInput>(input_stream).unwrap().attrs;
+
+        // Define expected output
+        let expected_output = Err("repr attribute must contain a type");
+
+        // Output
+        let output = EnumAttr::from_attributes(&input);
+
+        // Test
+        assert_eq!(expected_output, output)
     }
 }

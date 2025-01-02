@@ -22,37 +22,3 @@ pub fn derive_struct_impl(name: Ident, struct_data: &DataStruct) -> TokenStream 
         }
     }
 }
-
-// / A representation of a struct 
-// / that derives Zeroable trait
-// pub struct DeriveZeroableStruct {
-//     name: Ident,
-//     fields: Vec<(Ident, Type)>,
-// }
-
-// impl DeriveZeroableStruct {
-//     /// Returns the Zeroable implementation for the struct
-//     pub fn implementation(self) -> TokenStream {
-//         // Generate zeroed fields instructions
-//         let mut zeroed_fields: Vec<TokenStream> = Vec::new();
-
-//         for (n, t) in self.fields {
-//             let ty_span = t.span();
-//             // Add zeroing
-//             zeroed_fields.push(
-//                 quote_spanned!(ty_span => #n: <#t as safe_pod::Zeroable>::zeroed())
-//             );
-//         }
-
-//         let name = &self.name;
-
-//         quote! {
-//             impl safe_pod::Zeroable for #name {
-//                 #[inline]
-//                 fn zeroed() -> Self {
-//                     Self { #(#zeroed_fields),* }
-//                 }
-//             }
-//         }.to_token_stream()
-//     }
-// }
