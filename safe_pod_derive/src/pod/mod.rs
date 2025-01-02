@@ -1,14 +1,10 @@
 // Define modules
+mod attributes;
 mod r#struct;
-// mod r#enum;
+mod r#enum;
 
-use std::str::FromStr;
-
-use proc_macro2::{Literal, Span, TokenStream};
-use quote::{quote, quote_spanned, ToTokens};
-use syn::{spanned::Spanned, AttrStyle, Data, DeriveInput, Error, Expr, Fields, Ident, Type};
-
-use crate::shared::repr::Repr;
+use proc_macro2::TokenStream;
+use syn::{Data, DeriveInput, Error};
 
 /// Implementation of derive macro for Pod trait
 pub fn derive_pod_impl(input: DeriveInput) -> TokenStream {
@@ -25,115 +21,12 @@ pub fn derive_pod_impl(input: DeriveInput) -> TokenStream {
     if let Data::Struct(d) = &input.data {
         let name = input.ident;
         return r#struct::derive_struct_impl(name, d);
-    //     let mut fields: Vec<(Ident, Type)> = Vec::new();
-
-    //     match &d.fields {
-    //         Fields::Unit => {
-    //             return Error::new(
-    //                 name.span(),
-    //                 "Unit structs cannot be Pod YET!"
-    //             ).to_compile_error();
-    //         },
-    //         Fields::Unnamed(f) => {
-    //             return Error::new(
-    //                 f.span(),
-    //                 "Structs with unnamed fields cannot derive Pod"
-    //             ).to_compile_error();
-    //         },
-    //         Fields::Named(f) => {
-    //             for field in &f.named {
-    //                 fields.push(
-    //                     (field.ident.clone().unwrap(), field.ty.clone())
-    //                 );
-    //             }
-    //         }
-    //     }
-
-    //     return DerivePodStruct {
-    //         name, 
-    //         fields
-    //     }.implementation();
     }
 
     // If the type that derives Pod is an enum
     if let Data::Enum(d) = &input.data {
-        // // Get representation and make sure its supported
-        // let mut repr = Repr::NotSupported;
-
-        // for attribute in input.attrs {
-        //     // Ignore inner attributes
-        //     if let AttrStyle::Inner(_) = attribute.style {
-        //         continue;
-        //     }
-
-        //     // If path is repr
-        //     if attribute.path().is_ident("repr") {
-        //         // Check that repr is primitive
-        //         if let Err(e) = attribute.parse_nested_meta(
-        //             |meta| {
-        //                 // Assign the propper representation to repr
-        //                 repr = Repr::from_path(meta.path.clone());
-
-        //                 // If representation is supported
-        //                 if repr.is_pod() {
-        //                     return Ok(());
-        //                 }
-
-        //                 Err(meta.error("Unsupported representation"))
-        //             }
-        //         ) {
-        //             return e.to_compile_error();
-        //         }
-
-        //         // Break because #[repr] was found
-        //         break;
-        //     }
-        // }
-
-        return Error::new(
-            d.enum_token.span,
-            "Enums cannot derive Pod"
-        ).to_compile_error();
-
-        // Get name and init variants vector
-        // let name = input.ident;
-        // return r#enum::derive_enum_impl(name, d);
-
-        // let mut variants: Vec<(Ident, Span)> = Vec::new();
-
-        // // Go over variants
-        // for variant in &d.variants {
-        //     // Match fields
-        //     match &variant.fields {
-        //         // If variant is not unit
-        //         Fields::Unnamed(f) => {
-        //             return Error::new(
-        //                 f.span(),
-        //                 "Non unit-only Enums cannot derive Pod YET"
-        //             ).to_compile_error();
-        //         },
-        //         Fields::Named(f) => {
-        //             return Error::new(
-        //                 f.span(),
-        //                 "Non unit-only Enums cannot derive Pod YET"
-        //             ).to_compile_error();
-        //         },
-        //         // If variant is unit
-        //         Fields::Unit => {
-        //             // Push variant 
-        //             variants.push((
-        //                 variant.ident.clone(),
-        //                 variant.span()
-        //             ));
-        //         },
-        //     }
-        // }
-
-        // return DerivePodEnum {
-        //     repr,
-        //     name,
-        //     variants
-        // }.implementation()
+        let name = input.ident;
+        return r#enum::derive_enum_impl(name, input.attrs, d);
     }
 
     return TokenStream::new();
