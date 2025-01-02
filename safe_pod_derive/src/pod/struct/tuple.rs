@@ -1,5 +1,5 @@
 use proc_macro2::TokenStream;
-use quote::{format_ident, quote, quote_spanned};
+use quote::{quote, quote_spanned};
 use syn::{spanned::Spanned, FieldsUnnamed, Ident, Index};
 
 /// Implementation of derive macro for tuple structs
