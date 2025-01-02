@@ -22,14 +22,14 @@ dependencies = [
 
 [[package]]
 name = "safe_pod"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "safe_pod_derive",
 ]
 
 [[package]]
 name = "safe_pod_derive"
-version = "0.0.1"
+version = "0.0.2"
 dependencies = [
  "proc-macro2",
  "quote",

@@ -12,7 +12,7 @@ cargo add safe_pod
 ```
 or by adding the following to your ``Cargo.toml`` file:
 ```
-safe_pod = "0.0.1"
+safe_pod = "0.0.2"
 ```
 
 # Basic use
@@ -41,6 +41,30 @@ println!("Foo from bytes: {:#?}", foo_from_bytes);
 println!("Foo wrote {} bytes to byte buffer: {:#?}", bytes_written, bytes_from_foo);
 ```
 
-# Upcoming
-In following versions more primitive types will be supported,
-some ``std`` types will be supported too, and the derive macros will support `enum` types.
+All enums with variants where all types implement `Zeroable` can derive it. The "zero variant" must be marked with the `#[zero]` attribute. 
+
+Only (for now) [unit-like enums](https://doc.rust-lang.org/reference/items/enumerations.html#unit-only-enum) may derive the `Pod` trait. The enum must have the `#[pod(...)]` atrribute with the inner attribute `repr($type)` set to a type that implements `Pod`. Every variant must also have the `#[pod(...)]` atrribute with the inner attribute `match_expr($expression)` set to an expression of the type set in `repr($tpye)`.
+
+```rust
+#[derive(Debug, Pod, Zeroable)]
+#[pod(repr(u32))]
+enum UnitLikeEnum {
+    #[pod(match_expr(0))]
+    #[zero]
+    Foo,
+    #[pod(match_expr(1))]
+    Bar,
+}
+
+let zeroed_enum = UnitLikeEnum::zeroed();
+let enum_from_bytes = UnitLikeEnum::from_le_bytes(&[1, 0, 0, 0])?;
+let mut bytes_from_enum = [0u8; UnitLikeEnum::SIZE];
+let bytes_written = enum_from_bytes.to_be_bytes(&mut bytes_from_enum)?;
+
+println!("UnitLikeEnum zeroed: {:#?}", zeroed_enum);
+println!("UnitLikeEnum from bytes: {:#?}", enum_from_bytes);
+println!("UnitLikeEnum wrote {} bytes to byte buffer: {:#?}", bytes_written, bytes_from_enum);
+```
+
+# NOTE
+This project is still under heavy development. In the following versions I will be adding more features and documentation leading up to a `0.1.0` release.

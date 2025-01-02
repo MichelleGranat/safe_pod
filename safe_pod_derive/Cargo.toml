@@ -1,6 +1,6 @@
 [package]
 name = "safe_pod_derive"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 authors = ["Michelle Granat"]
 description = "Derive macros for safe_pod crate"
